@@ -1,15 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:paddingRight="5dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/user_avatar"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_margin="5dp"/>
+
     <TextView
-        android:id="@+id/item_view"
-        android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:gravity="center"
-        android:background="@drawable/item_press"
-        android:textSize="20sp"
-        android:text="1"/>
-</FrameLayout>
+        android:id="@+id/username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorUserName"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:text="RiverAndBoat"
+        app:layout_constraintLeft_toRightOf="@+id/user_avatar"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="5dp"/>
+
+    <TextView
+        android:id="@+id/content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="朋友圈内容"
+        android:textSize="15sp"
+        android:width="355dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toRightOf="@+id/user_avatar"
+        app:layout_constraintRight_toRightOf="@id/image_content_3"
+        app:layout_constraintTop_toBottomOf="@+id/username" />
+
+    <ImageView
+        android:id="@+id/image_content_1"
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:src="@drawable/image1"
+        android:scaleType="fitXY"
+        app:layout_constraintLeft_toRightOf="@+id/user_avatar"
+        app:layout_constraintTop_toBottomOf="@+id/content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"/>
+
+    <ImageView
+        android:id="@+id/image_content_2"
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:src="@drawable/image2"
+        android:scaleType="fitXY"
+        app:layout_constraintLeft_toRightOf="@+id/image_content_1"
+        app:layout_constraintRight_toLeftOf="@+id/image_content_3"
+        app:layout_constraintTop_toBottomOf="@+id/content"
+        android:layout_marginTop="5dp" />
+
+    <ImageView
+        android:id="@+id/image_content_3"
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:src="@drawable/image3"
+        android:scaleType="fitXY"
+        app:layout_constraintLeft_toRightOf="@+id/image_content_2"
+        app:layout_constraintTop_toBottomOf="@+id/content"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="5dp"/>
+
+    <TextView
+        android:id="@+id/edit_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="30分钟前"
+        android:textSize="10sp"
+        app:layout_constraintLeft_toRightOf="@+id/user_avatar"
+        app:layout_constraintTop_toBottomOf="@+id/image_content_1"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="5dp" />
+
+    <Button
+        android:id="@+id/edit_button"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:background="@android:drawable/btn_star"
+        app:layout_constraintRight_toLeftOf="@+id/comment"
+        app:layout_constraintTop_toBottomOf="@id/image_content_1"
+        app:layout_constraintBottom_toBottomOf="@id/edit_time"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"/>
+
+    <Button
+        android:id="@+id/comment"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:background="@android:drawable/ic_menu_edit"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/image_content_1"
+        android:layout_marginTop="10dp"
+        app:layout_constraintBottom_toBottomOf="@id/edit_time"
+        android:layout_marginRight="33dp"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

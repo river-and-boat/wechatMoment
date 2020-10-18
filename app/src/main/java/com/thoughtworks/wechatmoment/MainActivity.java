@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.thoughtworks.wechatmoment.adapter.WeChatItemAdapter;
+import com.thoughtworks.wechatmoment.viewmodel.WeChatItemViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
     private AppBarLayout mAppBarLayout;
 
-    private List<String> mDataSource;
+    private List<WeChatItemViewModel> mDataSource;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initData() {
         for (int i = 0; i < 20; i++) {
-            mDataSource.add("ITEM " + i);
+            mDataSource.add(new WeChatItemViewModel("小江爱学术", "今天真是开心的一天啊，吃了很久没吃的垃圾食品大炸鸡，嘻嘻"));
         }
     }
 

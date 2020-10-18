@@ -1,8 +1,11 @@
 package com.thoughtworks.wechatmoment.adapter;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,9 +18,9 @@ import java.util.List;
 
 public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.ViewHolder> {
 
-    private List<String> mWeChatItemList;
+    private List<WeChatItemViewModel> mWeChatItemList;
 
-    public WeChatItemAdapter(List<String> items) {
+    public WeChatItemAdapter(List<WeChatItemViewModel> items) {
         this.mWeChatItemList = items;
     }
 
@@ -31,7 +34,9 @@ public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.mTextView.setText(this.mWeChatItemList.get(position));
+        holder.username.setText(this.mWeChatItemList.get(position).getUsername());
+        holder.content.setText(this.mWeChatItemList.get(position).getContent());
+        holder.userAvatar.setImageResource(R.drawable.user_avatar);
     }
 
     @Override
@@ -40,10 +45,18 @@ public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.Vi
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView mTextView;
+
+        public TextView username;
+
+        public TextView content;
+
+        public ImageView userAvatar;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            mTextView = itemView.findViewById(R.id.item_view);
+            username = itemView.findViewById(R.id.username);
+            content = itemView.findViewById(R.id.content);
+            userAvatar = itemView.findViewById(R.id.user_avatar);
         }
     }
 }
