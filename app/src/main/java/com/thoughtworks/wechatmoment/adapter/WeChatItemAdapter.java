@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.thoughtworks.wechatmoment.R;
+import com.thoughtworks.wechatmoment.decoration.WeChatItemDecoration;
 import com.thoughtworks.wechatmoment.viewmodel.WeChatItemViewModel;
 
 import java.util.List;
@@ -42,6 +43,11 @@ public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.Vi
     @Override
     public int getItemCount() {
         return this.mWeChatItemList.size();
+    }
+
+    public void addItems(WeChatItemViewModel model) {
+        this.mWeChatItemList.add(model);
+        notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

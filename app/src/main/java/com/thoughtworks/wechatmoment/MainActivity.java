@@ -6,10 +6,12 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.graphics.Color;
 import android.media.Image;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ImageView;
@@ -37,6 +39,10 @@ public class MainActivity extends AppCompatActivity {
 
     private List<WeChatItemViewModel> mDataSource;
 
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+
+    private Handler mHandler;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -59,6 +65,14 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mWeChatItemAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayout.VERTICAL));
 
+        mHandler = new Handler();
+        mSwipeRefreshLayout = findViewById(R.id.swipe_layout);
+        mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            mSwipeRefreshLayout.setRefreshing(true);
+            mWeChatItemAdapter.addItems(new WeChatItemViewModel("新的测试用户", "今天真是开心的一天啊，这是一个新的测试用户"));
+            mHandler.postDelayed(() -> mSwipeRefreshLayout.setRefreshing(false), 1000);
+        });
+
         addAppBarListener();
     }
 
@@ -72,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initData() {
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 2; i++) {
             mDataSource.add(new WeChatItemViewModel("小江爱学术", "今天真是开心的一天啊，吃了很久没吃的垃圾食品大炸鸡，嘻嘻"));
         }
     }
