@@ -26,21 +26,29 @@ import com.thoughtworks.wechatmoment.viewmodel.WeChatItemViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.BindViews;
+import butterknife.ButterKnife;
+
 public class MainActivity extends AppCompatActivity {
 
     public static final String FOLD_TITLE = "朋友圈";
     public static final String UNFOLD_TITLE = "";
 
+    @BindView(R.id.toolbar)
     private Toolbar mToolbar;
+
     private RecyclerView mRecyclerView;
+
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+
     private WeChatItemAdapter mWeChatItemAdapter;
+
     private LinearLayoutManager mLinearLayoutManager;
 
     private AppBarLayout mAppBarLayout;
 
     private List<WeChatItemViewModel> mDataSource;
-
-    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     private Handler mHandler;
 
@@ -54,12 +62,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ButterKnife.bind(this);
+
         initToolBar();
 
         mDataSource = new ArrayList<>();
         initData();
 
         mRecyclerView = findViewById(R.id.we_chat_container);
+        mSwipeRefreshLayout = findViewById(R.id.swipe_layout);
+
         mWeChatItemAdapter = new WeChatItemAdapter(mDataSource);
         mLinearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
@@ -67,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayout.VERTICAL));
 
         mHandler = new Handler();
-        mSwipeRefreshLayout = findViewById(R.id.swipe_layout);
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             mSwipeRefreshLayout.setRefreshing(true);
             mWeChatItemAdapter.addItems(new WeChatItemViewModel("新的测试用户", "今天真是开心的一天啊，这是一个新的测试用户"));
@@ -78,7 +90,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initToolBar() {
-        mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
