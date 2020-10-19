@@ -37,11 +37,8 @@
         android:layout_marginTop="8dp"
         android:text="朋友圈内容"
         android:textSize="15sp"
-        android:width="355dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintLeft_toRightOf="@+id/user_avatar"
+        app:layout_constraintLeft_toLeftOf="@id/image_content_1"
         app:layout_constraintRight_toRightOf="@id/image_content_3"
         app:layout_constraintTop_toBottomOf="@+id/username" />
 
@@ -98,7 +95,7 @@
         app:layout_constraintTop_toBottomOf="@id/image_content_1"
         app:layout_constraintBottom_toBottomOf="@id/edit_time"
         android:layout_marginTop="10dp"
-        android:layout_marginRight="10dp"/>
+        android:layout_marginRight="5dp"/>
 
     <Button
         android:id="@+id/comment"
@@ -109,7 +106,30 @@
         app:layout_constraintTop_toBottomOf="@+id/image_content_1"
         android:layout_marginTop="10dp"
         app:layout_constraintBottom_toBottomOf="@id/edit_time"
-        android:layout_marginRight="33dp"/>
+        android:layout_marginRight="10dp"/>
 
+    <ImageView
+        android:id="@+id/admire_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:background="@android:drawable/star_on"
+        app:layout_constraintTop_toBottomOf="@+id/edit_time"
+        app:layout_constraintLeft_toLeftOf="@id/edit_time"
+        android:layout_marginTop="5dp"/>
 
+    <TextView
+        android:id="@+id/admire_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/admire_list"
+        android:textColor="@color/colorUserName"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@+id/edit_time"
+        app:layout_constraintLeft_toRightOf="@id/admire_icon"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="5dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

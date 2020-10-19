@@ -14,28 +14,33 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.thoughtworks.wechatmoment.adapter.WeChatItemAdapter;
 import com.thoughtworks.wechatmoment.viewmodel.WeChatItemViewModel;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final String FOLD_TITLE = "朋友圈";
     public static final String UNFOLD_TITLE = "";
 
-    @BindView(R.id.toolbar)
     private Toolbar mToolbar;
 
     private RecyclerView mRecyclerView;
@@ -50,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
 
     private List<WeChatItemViewModel> mDataSource;
 
+    private HashMap<Integer, Boolean> admireStatus;
+
     private Handler mHandler;
 
     @Override
@@ -63,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ButterKnife.bind(this);
+        admireStatus = new HashMap<>();
 
         initToolBar();
 
@@ -73,10 +80,12 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView = findViewById(R.id.we_chat_container);
         mSwipeRefreshLayout = findViewById(R.id.swipe_layout);
 
-        mWeChatItemAdapter = new WeChatItemAdapter(mDataSource);
+        initWeChatAdapter();
+
         mLinearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mWeChatItemAdapter);
+
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayout.VERTICAL));
 
         mHandler = new Handler();
@@ -89,7 +98,31 @@ public class MainActivity extends AppCompatActivity {
         addAppBarListener();
     }
 
+    private void initWeChatAdapter() {
+        mWeChatItemAdapter = new WeChatItemAdapter(mDataSource);
+        mWeChatItemAdapter.setOnItemClickListener((v, viewName, position) -> {
+            View chatItem = mLinearLayoutManager.findViewByPosition(position);
+            if (!admireStatus.keySet().contains(position)) {
+                chatItem.findViewById(R.id.admire_icon).setVisibility(View.VISIBLE);
+                ((TextView)chatItem.findViewById(R.id.admire_list)).setText(viewName);
+                admireStatus.put(position, true);
+            } else {
+                if (!admireStatus.get(position)) {
+                    chatItem.findViewById(R.id.admire_icon).setVisibility(View.VISIBLE);
+                    ((TextView)chatItem.findViewById(R.id.admire_list)).setText(viewName);
+                    admireStatus.put(position, true);
+                } else {
+                    chatItem.findViewById(R.id.admire_icon).setVisibility(View.GONE);
+                    ((TextView)chatItem.findViewById(R.id.admire_list)).setText("");
+                    admireStatus.put(position, false);
+                }
+
+            }
+        });
+    }
+
     private void initToolBar() {
+        mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
