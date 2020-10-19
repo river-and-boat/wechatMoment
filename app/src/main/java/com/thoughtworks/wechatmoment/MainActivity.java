@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
@@ -98,14 +99,17 @@ public class MainActivity extends AppCompatActivity {
             int color = Color.argb(255, 255, 255, 255);
             collapsingToolbarLayout.setCollapsedTitleTextColor(color);
             ImageView avatar = findViewById(R.id.avatar);
+            TextView username = findViewById(R.id.username);
             if (Math.abs(offset) >= bar.getTotalScrollRange()) {
                 // 折叠状态
                 collapsingToolbarLayout.setTitle(FOLD_TITLE);
                 avatar.setVisibility(View.GONE);
+                username.setVisibility(View.GONE);
             } else {
                 // 展开状态
                 collapsingToolbarLayout.setTitle(UNFOLD_TITLE);
                 avatar.setVisibility(View.VISIBLE);
+                username.setVisibility(View.VISIBLE);
             }
         });
     }
