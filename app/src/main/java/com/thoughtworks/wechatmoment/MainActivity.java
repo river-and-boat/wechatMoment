@@ -8,56 +8,44 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Color;
-import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.thoughtworks.wechatmoment.adapter.WeChatItemAdapter;
+import com.thoughtworks.wechatmoment.core.AdmireOperation;
+import com.thoughtworks.wechatmoment.core.CommentOperation;
 import com.thoughtworks.wechatmoment.viewmodel.WeChatItemViewModel;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import butterknife.BindView;
-import butterknife.BindViews;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final String FOLD_TITLE = "朋友圈";
     public static final String UNFOLD_TITLE = "";
 
-    private Toolbar mToolbar;
+    private WeChatItemAdapter weChatItemAdapter;
+    private List<WeChatItemViewModel> dataSource;
+    private LinearLayoutManager linearLayoutManager;
+    private RecyclerView recyclerView;
 
-    private RecyclerView mRecyclerView;
-
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-
-    private WeChatItemAdapter mWeChatItemAdapter;
-
-    private LinearLayoutManager mLinearLayoutManager;
-
-    private AppBarLayout mAppBarLayout;
-
-    private List<WeChatItemViewModel> mDataSource;
-
-    private HashMap<Integer, Boolean> admireStatus;
-
-    private Handler mHandler;
+    private AdmireOperation admireOperation;
+    private CommentOperation commentOperation;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -69,61 +57,70 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        admireStatus = new HashMap<>();
-
         initToolBar();
-
-        mDataSource = new ArrayList<>();
         initData();
-
-        mRecyclerView = findViewById(R.id.we_chat_container);
-        mSwipeRefreshLayout = findViewById(R.id.swipe_layout);
-
         initWeChatAdapter();
-
-        mLinearLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mRecyclerView.setAdapter(mWeChatItemAdapter);
-
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayout.VERTICAL));
-
-        mHandler = new Handler();
-        mSwipeRefreshLayout.setOnRefreshListener(() -> {
-            mSwipeRefreshLayout.setRefreshing(true);
-            mWeChatItemAdapter.addItems(new WeChatItemViewModel("新的测试用户", "今天真是开心的一天啊，这是一个新的测试用户"));
-            mHandler.postDelayed(() -> mSwipeRefreshLayout.setRefreshing(false), 1000);
-        });
-
+        initRecycleView();
+        initSwipeRefreshLayout();
         addAppBarListener();
+
+        admireOperation = new AdmireOperation();
+        commentOperation = new CommentOperation();
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void initRecycleView() {
+        linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView = findViewById(R.id.we_chat_container);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setAdapter(weChatItemAdapter);
+        recyclerView.addItemDecoration(
+                new DividerItemDecoration(this, LinearLayout.VERTICAL));
+    }
+
+    private void initSwipeRefreshLayout() {
+        SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.swipe_layout);
+        Handler handler = new Handler();
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            swipeRefreshLayout.setRefreshing(true);
+            weChatItemAdapter.addItems(new WeChatItemViewModel("新的测试用户",
+                    "今天真是开心的一天啊，这是一个新的测试用户"));
+            handler.postDelayed(() -> swipeRefreshLayout.setRefreshing(false), 1000);
+        });
     }
 
     private void initWeChatAdapter() {
-        mWeChatItemAdapter = new WeChatItemAdapter(mDataSource);
-        mWeChatItemAdapter.setOnItemClickListener((v, viewName, position) -> {
-            View chatItem = mLinearLayoutManager.findViewByPosition(position);
-            if (!admireStatus.keySet().contains(position)) {
-                chatItem.findViewById(R.id.admire_icon).setVisibility(View.VISIBLE);
-                ((TextView)chatItem.findViewById(R.id.admire_list)).setText(viewName);
-                admireStatus.put(position, true);
-            } else {
-                if (!admireStatus.get(position)) {
-                    chatItem.findViewById(R.id.admire_icon).setVisibility(View.VISIBLE);
-                    ((TextView)chatItem.findViewById(R.id.admire_list)).setText(viewName);
-                    admireStatus.put(position, true);
-                } else {
-                    chatItem.findViewById(R.id.admire_icon).setVisibility(View.GONE);
-                    ((TextView)chatItem.findViewById(R.id.admire_list)).setText("");
-                    admireStatus.put(position, false);
+        weChatItemAdapter = new WeChatItemAdapter(dataSource);
+        weChatItemAdapter.setOnItemClickListener((v, viewName, position) -> {
+            View chatItem = linearLayoutManager.findViewByPosition(position);
+            InputMethodManager inputMethodManager = (InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (chatItem != null) {
+                switch (v.getId()) {
+                    case R.id.edit_button:
+                        admireOperation.admireWeChatItem(viewName, chatItem, position);
+                        break;
+                    case R.id.comment:
+                        commentOperation.shrinkCommentWeChatItem(inputMethodManager);
+                        inputMethodManager = (InputMethodManager)
+                                getSystemService(Context.INPUT_METHOD_SERVICE);
+                        commentOperation.expandCommentWeChatItem(inputMethodManager, chatItem, recyclerView);
+                        break;
+                    default:
+                        EditText commentInput = v.findViewById(R.id.comment_input);
+                        Button commentSendButton = v.findViewById(R.id.send_comment);
+                        inputMethodManager = (InputMethodManager)
+                                getSystemService(Context.INPUT_METHOD_SERVICE);
+                        commentOperation.shrinkCommentWeChatItem(inputMethodManager);
+                        break;
                 }
-
             }
         });
     }
 
     private void initToolBar() {
-        mToolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -131,14 +128,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initData() {
+        dataSource = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            mDataSource.add(new WeChatItemViewModel("小江爱学术", "今天真是开心的一天啊，吃了很久没吃的垃圾食品大炸鸡，嘻嘻"));
+            dataSource.add(new WeChatItemViewModel("小江爱学术", "今天真是开心的一天啊，吃了很久没吃的垃圾食品大炸鸡，嘻嘻"));
         }
     }
 
     private void addAppBarListener() {
-        mAppBarLayout = findViewById(R.id.appBar);
-        mAppBarLayout.addOnOffsetChangedListener((bar, offset) -> {
+        AppBarLayout appBarLayout = findViewById(R.id.appBar);
+        appBarLayout.addOnOffsetChangedListener((bar, offset) -> {
             CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsingToolbarLayout);
             int color = Color.argb(255, 255, 255, 255);
             collapsingToolbarLayout.setCollapsedTitleTextColor(color);

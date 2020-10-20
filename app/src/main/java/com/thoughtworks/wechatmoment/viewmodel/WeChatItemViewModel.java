@@ -1,6 +1,9 @@
 package com.thoughtworks.wechatmoment.viewmodel;
 
-public class WeChatItemViewModel {
+
+import androidx.lifecycle.ViewModel;
+
+public class WeChatItemViewModel extends ViewModel {
 
     private String username;
 

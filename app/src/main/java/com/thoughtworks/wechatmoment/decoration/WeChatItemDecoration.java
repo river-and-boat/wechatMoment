@@ -10,9 +10,11 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.Objects;
+
 public class WeChatItemDecoration extends RecyclerView.ItemDecoration {
 
-    private Drawable mDrawable;
+    private final Drawable mDrawable;
 
     public static final int[] ATTRS = new int[]{android.R.attr.listDivider};
 
@@ -23,7 +25,8 @@ public class WeChatItemDecoration extends RecyclerView.ItemDecoration {
     }
 
     @Override
-    public void onDraw(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+    public void onDraw(@NonNull Canvas c, @NonNull RecyclerView parent,
+                       @NonNull RecyclerView.State state) {
         int left = parent.getPaddingLeft();
         int right = parent.getWidth() - parent.getPaddingRight();
 
@@ -39,9 +42,10 @@ public class WeChatItemDecoration extends RecyclerView.ItemDecoration {
     }
 
     @Override
-    public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+    public void getItemOffsets(@NonNull Rect outRect, @NonNull View view,
+                               @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
         int position = parent.getChildLayoutPosition(view);
-        if (position != parent.getAdapter().getItemCount() - 1) {
+        if (position != Objects.requireNonNull(parent.getAdapter()).getItemCount() - 1) {
             outRect.set(0, 0, 0, mDrawable.getIntrinsicHeight());
         }
     }

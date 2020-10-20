@@ -3,4 +3,8 @@
     <string name="username">小江爱学术</string>
     <string name="application_name">朋友圈</string>
     <string name="admire_list">点赞列表</string>
+    <string name="avatar">avatar</string>
+    <string name="background">background image</string>
+    <string name="comment_hint">评论</string>
+    <string name="send_button">发送</string>
 </resources>
