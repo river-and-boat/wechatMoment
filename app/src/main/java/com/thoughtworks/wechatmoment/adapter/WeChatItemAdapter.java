@@ -45,6 +45,7 @@ public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.Vi
         holder.userAvatar.setImageResource(R.drawable.user_avatar);
         holder.admireIcon.setVisibility(View.GONE);
         holder.admireList.setText("");
+        holder.editTime.setText("30分钟前");
         holder.admireList.setVisibility(View.GONE);
         holder.admireButton.setTag(position);
         holder.commentInput.setVisibility(View.GONE);
@@ -94,6 +95,7 @@ public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.Vi
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView username;
         public TextView content;
+        public TextView editTime;
         public ImageView userAvatar;
         public Button admireButton;
         public Button commentButton;
@@ -107,6 +109,7 @@ public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.Vi
             username = itemView.findViewById(R.id.username);
             content = itemView.findViewById(R.id.content);
             userAvatar = itemView.findViewById(R.id.user_avatar);
+            editTime = itemView.findViewById(R.id.edit_time);
             admireButton = itemView.findViewById(R.id.edit_button);
             admireIcon = itemView.findViewById(R.id.admire_icon);
             admireList = itemView.findViewById(R.id.admire_list);
