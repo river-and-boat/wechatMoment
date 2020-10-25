@@ -1,6 +1,7 @@
 package com.thoughtworks.wechatmoment.viewmodel;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 
 import androidx.annotation.NonNull;
@@ -29,12 +30,12 @@ public class WeChatItemViewModel extends ViewModel {
         chatMoments.setValue(chatMomentRepository.getChatMomentList());
     }
 
-    public LiveData<Boolean> getIsUpdating() {
-        return this.itemIsUpdating;
+    public LiveData<Boolean> getItemIsUpdating() {
+        return itemIsUpdating;
     }
 
     public LiveData<List<ChatMoment>> getChatMomentList() {
-        return this.chatMoments;
+        return chatMoments;
     }
 
     public void addNewItems() {

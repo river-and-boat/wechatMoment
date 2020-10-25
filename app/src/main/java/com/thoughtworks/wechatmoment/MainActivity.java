@@ -10,33 +10,27 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.Menu;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.thoughtworks.wechatmoment.adapter.WeChatItemAdapter;
 import com.thoughtworks.wechatmoment.core.AdmireOperation;
 import com.thoughtworks.wechatmoment.core.CommentOperation;
 import com.thoughtworks.wechatmoment.model.ChatMoment;
-import com.thoughtworks.wechatmoment.model.ContentImage;
-import com.thoughtworks.wechatmoment.model.UserSender;
+import com.thoughtworks.wechatmoment.model.User;
+import com.thoughtworks.wechatmoment.viewmodel.UserViewModel;
 import com.thoughtworks.wechatmoment.viewmodel.WeChatItemViewModel;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -49,10 +43,16 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
 
     private WeChatItemViewModel chatItemViewModel;
+    private UserViewModel userViewModel;
+
     private SwipeRefreshLayout swipeRefreshLayout;
 
     private AdmireOperation admireOperation;
     private CommentOperation commentOperation;
+
+    private TextView username;
+    private ImageView avatar;
+    private ImageView profileImage;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         initRecycleView();
         initSwipeRefreshLayout();
         addAppBarListener();
+        initUserInfo();
 
         admireOperation = new AdmireOperation();
         commentOperation = new CommentOperation();
@@ -89,12 +90,30 @@ public class MainActivity extends AppCompatActivity {
         chatItemViewModel.init();
         chatItemViewModel.getChatMomentList().observe(this, (Observer<List<ChatMoment>>)
                 chatMoments -> weChatItemAdapter.notifyDataSetChanged());
-        chatItemViewModel.getIsUpdating().observe(this, isUpdating -> {
+        chatItemViewModel.getItemIsUpdating().observe(this, isUpdating -> {
             swipeRefreshLayout.setRefreshing(isUpdating);
             if (!isUpdating) {
                 recyclerView.smoothScrollToPosition(chatItemViewModel
                         .getChatMomentList().getValue().size() - 1);
             }
+        });
+    }
+
+    private void initUserInfo() {
+        userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
+        userViewModel.init();
+        username = findViewById(R.id.username);
+        avatar = findViewById(R.id.avatar);
+        profileImage = findViewById(R.id.back_image);
+        userViewModel.getUserInfo().observe(this, (Observer<User>) user -> {
+            User userInfo = userViewModel.getUserInfo().getValue();
+            username.setText(userInfo.getNick());
+            // TODO: How to avoid load picture in UI Thread
+            // Or It has been an async framework.
+            Glide.with(MainActivity.this).asBitmap()
+                    .load(userInfo.getAvatar()).into(avatar);
+            Glide.with(MainActivity.this).asBitmap()
+                    .load(userInfo.getProfileImage()).into(profileImage);
         });
     }
 

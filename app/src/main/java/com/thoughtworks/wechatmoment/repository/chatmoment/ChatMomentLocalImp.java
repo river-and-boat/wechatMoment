@@ -2,8 +2,6 @@ package com.thoughtworks.wechatmoment.repository.chatmoment;
 
 import android.os.Message;
 
-import androidx.lifecycle.MutableLiveData;
-
 import com.thoughtworks.wechatmoment.model.ChatMoment;
 import com.thoughtworks.wechatmoment.model.ContentImage;
 import com.thoughtworks.wechatmoment.model.UserSender;

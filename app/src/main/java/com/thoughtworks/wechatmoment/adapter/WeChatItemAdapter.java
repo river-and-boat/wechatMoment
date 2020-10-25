@@ -57,6 +57,7 @@ public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.Vi
         holder.username.setText(sender.getUsername());
         holder.content.setText(content);
 
+        // TODO: How to avoid load picture in UI Thread
         Glide.with(context).asBitmap()
                 .load(sender.getAvatar())
                 .into(holder.userAvatar);
@@ -75,11 +76,6 @@ public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.Vi
     @Override
     public int getItemCount() {
         return this.chatMoments.size();
-    }
-
-    public void addItems(ChatMoment chatMoment) {
-        this.chatMoments.add(chatMoment);
-        notifyDataSetChanged();
     }
 
     public interface OnItemClickListener {

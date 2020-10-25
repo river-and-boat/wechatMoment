@@ -12,6 +12,5 @@ public class ChatMomentRemoteImp implements ChatMomentRepository {
     }
 
     @Override
-    public void addNewChatMoment() {
-    }
+    public void addNewChatMoment() { }
 }
