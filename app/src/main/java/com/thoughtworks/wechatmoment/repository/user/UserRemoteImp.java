@@ -10,7 +10,7 @@ public class UserRemoteImp implements UserRepository {
     }
 
     @Override
-    public void editUserInfo(User user) {
-
+    public User editUserInfo(User user) {
+        return null;
     }
 }

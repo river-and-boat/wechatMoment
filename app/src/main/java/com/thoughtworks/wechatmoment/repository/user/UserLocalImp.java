@@ -36,9 +36,10 @@ public class UserLocalImp implements UserRepository {
     }
 
     @Override
-    public void editUserInfo(User user) {
+    public User editUserInfo(User user) {
         if (user != null) {
             UserLocalImp.user = user;
         }
+        return UserLocalImp.user;
     }
 }

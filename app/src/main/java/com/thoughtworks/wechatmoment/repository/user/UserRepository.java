@@ -5,5 +5,5 @@ import com.thoughtworks.wechatmoment.model.User;
 
 public interface UserRepository {
     User getUserInfo();
-    void editUserInfo(User user);
+    User editUserInfo(User user);
 }

@@ -19,6 +19,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.AppBarLayout;
@@ -54,6 +55,11 @@ public class MainActivity extends AppCompatActivity {
     private ImageView avatar;
     private ImageView profileImage;
 
+    private final static String TEST_USER_EDIT_PROFILE = "https://timgsa.baidu.com/timg?" +
+            "image&quality=80&size=b9999_10000&sec=1603643811415&di=d80ffe3aa54af794ff4bb64e0f" +
+            "8b176f&imgtype=0&src=http%3A%2F%2Fa3.att.hudong.com%2F14%2F75%2F01300000164186121" +
+            "366756803686.jpg";
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -69,8 +75,8 @@ public class MainActivity extends AppCompatActivity {
         initWeChatAdapter();
         initRecycleView();
         initSwipeRefreshLayout();
-        addAppBarListener();
         initUserInfo();
+        addAppBarListener();
 
         admireOperation = new AdmireOperation();
         commentOperation = new CommentOperation();
@@ -102,8 +108,8 @@ public class MainActivity extends AppCompatActivity {
     private void initUserInfo() {
         userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
         userViewModel.init();
-        username = findViewById(R.id.username);
         avatar = findViewById(R.id.avatar);
+        username = findViewById(R.id.username);
         profileImage = findViewById(R.id.back_image);
         userViewModel.getUserInfo().observe(this, (Observer<User>) user -> {
             User userInfo = userViewModel.getUserInfo().getValue();
@@ -114,6 +120,11 @@ public class MainActivity extends AppCompatActivity {
                     .load(userInfo.getAvatar()).into(avatar);
             Glide.with(MainActivity.this).asBitmap()
                     .load(userInfo.getProfileImage()).into(profileImage);
+        });
+        profileImage.setOnClickListener(v -> {
+            User userEditing = userViewModel.getUserInfo().getValue();
+            userEditing.setProfileImage(TEST_USER_EDIT_PROFILE);
+            userViewModel.editUserInfo(userEditing);
         });
     }
 
@@ -159,6 +170,7 @@ public class MainActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        toolbar.setNavigationOnClickListener(v -> finish());
     }
 
     private void addAppBarListener() {
@@ -167,8 +179,6 @@ public class MainActivity extends AppCompatActivity {
             CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsingToolbarLayout);
             int color = Color.argb(255, 255, 255, 255);
             collapsingToolbarLayout.setCollapsedTitleTextColor(color);
-            ImageView avatar = findViewById(R.id.avatar);
-            TextView username = findViewById(R.id.username);
             if (Math.abs(offset) >= bar.getTotalScrollRange()) {
                 // 折叠状态
                 collapsingToolbarLayout.setTitle(FOLD_TITLE);

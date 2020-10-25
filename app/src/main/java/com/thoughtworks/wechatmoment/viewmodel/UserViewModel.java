@@ -31,6 +31,7 @@ public class UserViewModel extends ViewModel {
     }
 
     public void editUserInfo(User user) {
-        userRepository.editUserInfo(user);
+        User editedUser = userRepository.editUserInfo(user);
+        userInfo.setValue(editedUser);
     }
 }
