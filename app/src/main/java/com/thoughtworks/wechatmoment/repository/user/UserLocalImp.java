@@ -1,5 +1,8 @@
 package com.thoughtworks.wechatmoment.repository.user;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+
 import com.thoughtworks.wechatmoment.model.User;
 
 public class UserLocalImp implements UserRepository {
@@ -24,6 +27,13 @@ public class UserLocalImp implements UserRepository {
 
     @Override
     public User getUserInfo() {
-        return user;
+        return UserLocalImp.user;
+    }
+
+    @Override
+    public void editUserInfo(User user) {
+        if (user != null) {
+            UserLocalImp.user = user;
+        }
     }
 }

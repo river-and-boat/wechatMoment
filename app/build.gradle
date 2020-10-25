@@ -29,9 +29,10 @@ android {
 }
 
 dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
     // https://mvnrepository.com/artifact/com.jakewharton/butterknife
-    compile group: 'com.jakewharton', name: 'butterknife', version: '10.2.3'
+    implementation group: 'com.jakewharton', name: 'butterknife', version: '10.2.3'
     //noinspection GradleCompatible
     implementation 'com.android.support:appcompat-v7:27.0.2'
     implementation 'androidx.appcompat:appcompat:1.2.0'
@@ -40,4 +41,17 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+    //noinspection GradleCompatible
+    implementation 'com.android.support:recyclerview-v7:27.0.2'
+
+    implementation group: 'android.arch.lifecycle', name: 'extensions', version: '1.1.1'
+    implementation group: 'android.arch.lifecycle', name: 'runtime', version: '1.1.1'
+
+    //glide
+    implementation 'com.github.bumptech.glide:glide:4.4.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.4.0'
+
+    //circle imageview
+    implementation 'de.hdodenhof:circleimageview:2.2.0'
 }

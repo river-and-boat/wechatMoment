@@ -3,6 +3,8 @@ package com.thoughtworks.wechatmoment;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,6 +30,9 @@ import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.thoughtworks.wechatmoment.adapter.WeChatItemAdapter;
 import com.thoughtworks.wechatmoment.core.AdmireOperation;
 import com.thoughtworks.wechatmoment.core.CommentOperation;
+import com.thoughtworks.wechatmoment.model.ChatMoment;
+import com.thoughtworks.wechatmoment.model.ContentImage;
+import com.thoughtworks.wechatmoment.model.UserSender;
 import com.thoughtworks.wechatmoment.viewmodel.WeChatItemViewModel;
 
 import java.util.ArrayList;
@@ -40,9 +45,11 @@ public class MainActivity extends AppCompatActivity {
     public static final String UNFOLD_TITLE = "";
 
     private WeChatItemAdapter weChatItemAdapter;
-    private List<WeChatItemViewModel> dataSource;
     private LinearLayoutManager linearLayoutManager;
     private RecyclerView recyclerView;
+
+    private WeChatItemViewModel chatItemViewModel;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private AdmireOperation admireOperation;
     private CommentOperation commentOperation;
@@ -57,8 +64,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initChatItemViewModel();
         initToolBar();
-        initData();
         initWeChatAdapter();
         initRecycleView();
         initSwipeRefreshLayout();
@@ -68,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
         commentOperation = new CommentOperation();
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     private void initRecycleView() {
         linearLayoutManager = new LinearLayoutManager(this);
         recyclerView = findViewById(R.id.we_chat_container);
@@ -78,19 +84,30 @@ public class MainActivity extends AppCompatActivity {
                 new DividerItemDecoration(this, LinearLayout.VERTICAL));
     }
 
+    private void initChatItemViewModel() {
+        chatItemViewModel = ViewModelProviders.of(this).get(WeChatItemViewModel.class);
+        chatItemViewModel.init();
+        chatItemViewModel.getChatMomentList().observe(this, (Observer<List<ChatMoment>>)
+                chatMoments -> weChatItemAdapter.notifyDataSetChanged());
+        chatItemViewModel.getIsUpdating().observe(this, isUpdating -> {
+            swipeRefreshLayout.setRefreshing(isUpdating);
+            if (!isUpdating) {
+                recyclerView.smoothScrollToPosition(chatItemViewModel
+                        .getChatMomentList().getValue().size() - 1);
+            }
+        });
+    }
+
     private void initSwipeRefreshLayout() {
-        SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.swipe_layout);
-        Handler handler = new Handler();
+        swipeRefreshLayout = findViewById(R.id.swipe_layout);
         swipeRefreshLayout.setOnRefreshListener(() -> {
-            swipeRefreshLayout.setRefreshing(true);
-            weChatItemAdapter.addItems(new WeChatItemViewModel("新的测试用户",
-                    "今天真是开心的一天啊，这是一个新的测试用户"));
-            handler.postDelayed(() -> swipeRefreshLayout.setRefreshing(false), 1000);
+            chatItemViewModel.addNewItems();
         });
     }
 
     private void initWeChatAdapter() {
-        weChatItemAdapter = new WeChatItemAdapter(dataSource);
+        weChatItemAdapter = new WeChatItemAdapter(this,
+                chatItemViewModel.getChatMomentList().getValue());
         weChatItemAdapter.setOnItemClickListener((v, viewName, position) -> {
             View chatItem = linearLayoutManager.findViewByPosition(position);
             InputMethodManager inputMethodManager = (InputMethodManager)
@@ -107,8 +124,6 @@ public class MainActivity extends AppCompatActivity {
                         commentOperation.expandCommentWeChatItem(inputMethodManager, chatItem, recyclerView);
                         break;
                     default:
-                        EditText commentInput = v.findViewById(R.id.comment_input);
-                        Button commentSendButton = v.findViewById(R.id.send_comment);
                         inputMethodManager = (InputMethodManager)
                                 getSystemService(Context.INPUT_METHOD_SERVICE);
                         commentOperation.shrinkCommentWeChatItem(inputMethodManager);
@@ -124,13 +139,6 @@ public class MainActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-        }
-    }
-
-    private void initData() {
-        dataSource = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
-            dataSource.add(new WeChatItemViewModel("小江爱学术", "今天真是开心的一天啊，吃了很久没吃的垃圾食品大炸鸡，嘻嘻"));
         }
     }
 

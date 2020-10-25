@@ -1,5 +1,6 @@
 package com.thoughtworks.wechatmoment.adapter;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,24 +12,33 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.thoughtworks.wechatmoment.R;
-import com.thoughtworks.wechatmoment.viewmodel.WeChatItemViewModel;
+import com.thoughtworks.wechatmoment.model.ChatMoment;
+import com.thoughtworks.wechatmoment.model.ContentImage;
+import com.thoughtworks.wechatmoment.model.UserSender;
 
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.ViewHolder>
         implements View.OnClickListener {
+
+    private List<ChatMoment> chatMoments;
+    private Context context;
 
     public static final String VIEW_NAME = "Admire Click";
     public static final String COMMENT = "COMMENT";
     public static final String ITEM = "ITEM";
 
-    private final List<WeChatItemViewModel> mWeChatItemList;
     private final int editButtonId = R.id.edit_button;
     private final int commentButtonId = R.id.comment;
 
-    public WeChatItemAdapter(List<WeChatItemViewModel> items) {
-        this.mWeChatItemList = items;
+    public WeChatItemAdapter(Context context,
+                             List<ChatMoment> chatMoments) {
+        this.chatMoments = chatMoments;
+        this.context = context;
     }
 
     @NonNull
@@ -40,9 +50,17 @@ public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.username.setText(this.mWeChatItemList.get(position).getUsername());
-        holder.content.setText(this.mWeChatItemList.get(position).getContent());
-        holder.userAvatar.setImageResource(R.drawable.user_avatar);
+        UserSender sender = chatMoments.get(position).getSender();
+        String content = chatMoments.get(position).getContent();
+        List<ContentImage> images = chatMoments.get(position).getImages();
+
+        holder.username.setText(sender.getUsername());
+        holder.content.setText(content);
+
+        Glide.with(context).asBitmap()
+                .load(sender.getAvatar())
+                .into(holder.userAvatar);
+
         holder.admireIcon.setVisibility(View.GONE);
         holder.admireList.setText("");
         holder.editTime.setText("30分钟前");
@@ -56,11 +74,11 @@ public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.Vi
 
     @Override
     public int getItemCount() {
-        return this.mWeChatItemList.size();
+        return this.chatMoments.size();
     }
 
-    public void addItems(WeChatItemViewModel model) {
-        this.mWeChatItemList.add(model);
+    public void addItems(ChatMoment chatMoment) {
+        this.chatMoments.add(chatMoment);
         notifyDataSetChanged();
     }
 
@@ -96,7 +114,7 @@ public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.Vi
         public TextView username;
         public TextView content;
         public TextView editTime;
-        public ImageView userAvatar;
+        public CircleImageView userAvatar;
         public Button admireButton;
         public Button commentButton;
         public ImageView admireIcon;
