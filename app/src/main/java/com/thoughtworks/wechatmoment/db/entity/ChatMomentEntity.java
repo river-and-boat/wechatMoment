@@ -1,5 +1,7 @@
 package com.thoughtworks.wechatmoment.db.entity;
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -8,8 +10,10 @@ import java.util.Date;
 @Entity(tableName = "chat_moments")
 public class ChatMomentEntity {
 
-    @PrimaryKey(autoGenerate = true)
-    private int id;
+    @PrimaryKey
+    @ColumnInfo(name = "chat_id")
+    @NonNull
+    private String chatId;
 
     private String content;
 
@@ -21,12 +25,12 @@ public class ChatMomentEntity {
 
     private Date date;
 
-    public int getId() {
-        return id;
+    public String getChatId() {
+        return chatId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setChatId(String id) {
+        this.chatId = id;
     }
 
     public String getContent() {

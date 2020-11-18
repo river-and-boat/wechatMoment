@@ -1,10 +1,14 @@
 package com.thoughtworks.wechatmoment.db.repository;
 
+import android.os.AsyncTask;
+
 import com.thoughtworks.wechatmoment.db.WeChatDataBase;
 import com.thoughtworks.wechatmoment.db.entity.ChatMomentEntity;
 import com.thoughtworks.wechatmoment.db.entity.CommentEntity;
+import com.thoughtworks.wechatmoment.db.entity.UserEntity;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class DataRepository {
 
@@ -16,7 +20,7 @@ public class DataRepository {
         this.weChatDataBase = weChatDataBase;
     }
 
-    public DataRepository getInstance(final WeChatDataBase weChatDataBase) {
+    public static DataRepository getInstance(final WeChatDataBase weChatDataBase) {
         if (dataRepository == null) {
             synchronized (DataRepository.class) {
                 if (dataRepository == null) {
@@ -41,5 +45,13 @@ public class DataRepository {
 
     public void addComment(CommentEntity commentEntity) {
         weChatDataBase.commentDao().insertAComments(commentEntity);
+    }
+
+    public void updateUserInfo(UserEntity userEntity) {
+        weChatDataBase.userDao().updateUserInfo(userEntity);
+    }
+
+    public UserEntity getUserInfo() {
+        return weChatDataBase.userDao().getUser();
     }
 }

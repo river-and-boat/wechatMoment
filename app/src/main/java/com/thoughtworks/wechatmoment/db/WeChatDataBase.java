@@ -40,9 +40,6 @@ public abstract class WeChatDataBase extends RoomDatabase {
 
     public abstract UserDao userDao();
 
-    private WeChatDataBase() {
-    }
-
     public static WeChatDataBase getInstance(Context context, AppExecutors appExecutors) {
         if (weChatDataBase == null) {
             synchronized (WeChatDataBase.class) {
@@ -56,20 +53,17 @@ public abstract class WeChatDataBase extends RoomDatabase {
 
     private static WeChatDataBase buildDatabase(final Context context,
                                                 final AppExecutors executors) {
-        return Room.databaseBuilder(context.getApplicationContext(),
-                WeChatDataBase.class, DATA_BASE_NAME).addCallback(new Callback() {
-            @Override
-            public void onCreate(@NonNull SupportSQLiteDatabase db) {
-                super.onCreate(db);
-                executors.getDiskExecutor().execute(() -> {
-                    WeChatDataBase weChatDataBase = getInstance(context, executors);
-                    List<ChatMomentEntity> chatMoments = DataGenerator.getChatMoments();
-                    List<CommentEntity> comments = DataGenerator.getComments(chatMoments);
-                    UserEntity user = DataGenerator.getUser();
-                    insertData(weChatDataBase, chatMoments, comments, user);
-                });
-            }
-        }).build();
+        weChatDataBase = Room.databaseBuilder(context.getApplicationContext(),
+                WeChatDataBase.class, DATA_BASE_NAME)
+                .allowMainThreadQueries()
+                .build();
+
+        List<ChatMomentEntity> chatMoments = DataGenerator.getChatMoments();
+        List<CommentEntity> comments = DataGenerator.getComments(chatMoments);
+        UserEntity user = DataGenerator.getUser();
+        insertData(weChatDataBase, chatMoments, comments, user);
+
+        return weChatDataBase;
     }
 
     private static void insertData(final WeChatDataBase weChatDataBase,
@@ -78,7 +72,13 @@ public abstract class WeChatDataBase extends RoomDatabase {
                                    final UserEntity user) {
         weChatDataBase.runInTransaction(() -> {
             weChatDataBase.chatMomentDao().insertChatMoments(chatMoments);
+//            weChatDataBase.commentDao().insertAllComments(comments);
+//            weChatDataBase.userDao().insertAUser(user);
+        });
+        weChatDataBase.runInTransaction(() -> {
             weChatDataBase.commentDao().insertAllComments(comments);
+        });
+        weChatDataBase.runInTransaction(() -> {
             weChatDataBase.userDao().insertAUser(user);
         });
     }

@@ -8,6 +8,9 @@ import androidx.room.Update;
 
 import com.thoughtworks.wechatmoment.db.entity.UserEntity;
 
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
+
 @Dao
 public interface UserDao {
 

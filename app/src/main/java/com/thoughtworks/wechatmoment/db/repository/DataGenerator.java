@@ -55,6 +55,7 @@ public class DataGenerator {
         for (int i = 0; i < CONTENTS.length; i++) {
             ChatMomentEntity chatMoment = new ChatMomentEntity(CONTENTS[i], AVATARS[i],
                     NAMES[i], NAMES[i], new Date());
+            chatMoment.setChatId(String.valueOf(i));
             chatMoments.add(chatMoment);
         }
         return chatMoments;
@@ -64,7 +65,8 @@ public class DataGenerator {
         List<CommentEntity> comments = new ArrayList<>();
         for (int i = 0; i < chatMoments.size(); i++) {
             CommentEntity comment = new CommentEntity(CONTENTS[i], AVATARS[i], NAMES[i], NAMES[i],
-                    chatMoments.get(i).getId(), new Date());
+                    chatMoments.get(i).getChatId(), new Date());
+            comment.setId(i);
             comments.add(comment);
         }
         return comments;

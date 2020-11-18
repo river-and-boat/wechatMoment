@@ -4,6 +4,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -24,6 +25,7 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.thoughtworks.wechatmoment.R;
+import com.thoughtworks.wechatmoment.db.entity.UserEntity;
 import com.thoughtworks.wechatmoment.ui.adapter.WeChatItemAdapter;
 import com.thoughtworks.wechatmoment.ui.core.AdmireOperation;
 import com.thoughtworks.wechatmoment.ui.core.CommentOperation;
@@ -111,18 +113,16 @@ public class MainActivity extends AppCompatActivity {
         avatar = findViewById(R.id.avatar);
         username = findViewById(R.id.username);
         profileImage = findViewById(R.id.back_image);
-        userViewModel.getUserInfo().observe(this, (Observer<User>) user -> {
-            User userInfo = userViewModel.getUserInfo().getValue();
-            username.setText(userInfo.getNick());
-            // TODO: How to avoid load picture in UI Thread
+        userViewModel.getUserInfo().observe(this, user -> {
+            username.setText(user.getNick());
             // Or It has been an async framework.
             Glide.with(MainActivity.this).asBitmap()
-                    .load(userInfo.getAvatar()).into(avatar);
+                    .load(user.getAvatar()).into(avatar);
             Glide.with(MainActivity.this).asBitmap()
-                    .load(userInfo.getProfileImage()).into(profileImage);
+                    .load(user.getProfileImage()).into(profileImage);
         });
         profileImage.setOnClickListener(v -> {
-            User userEditing = userViewModel.getUserInfo().getValue();
+            UserEntity userEditing = userViewModel.getUserInfo().getValue();
             userEditing.setProfileImage(TEST_USER_EDIT_PROFILE);
             userViewModel.editUserInfo(userEditing);
         });

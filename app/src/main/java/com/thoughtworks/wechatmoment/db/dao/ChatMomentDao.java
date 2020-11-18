@@ -15,7 +15,7 @@ public interface ChatMomentDao {
     @Query("SELECT * FROM chat_moments")
     List<ChatMomentEntity> loadChatMoments();
 
-    @Query("SELECT * FROM chat_moments WHERE id = :chatMomentId")
+    @Query("SELECT * FROM chat_moments WHERE chat_id = :chatMomentId")
     ChatMomentEntity loadChatMomentsById(int chatMomentId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

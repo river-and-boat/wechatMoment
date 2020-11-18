@@ -1,5 +1,6 @@
 package com.thoughtworks.wechatmoment.db.entity;
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
@@ -8,16 +9,18 @@ import java.util.Date;
 
 @Entity(tableName = "comments", foreignKeys = {
         @ForeignKey(entity = ChatMomentEntity.class,
-                parentColumns = "id",
-                childColumns = "chatMomentId",
+                parentColumns = "chat_id",
+                childColumns = "comment_chat_id",
                 onDelete = ForeignKey.CASCADE)
 })
 public class CommentEntity {
 
     @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "comment_id")
     private int id;
 
-    private int chatMomentId;
+    @ColumnInfo(name = "comment_chat_id")
+    private String chatMomentId;
 
     private String content;
 
@@ -37,11 +40,11 @@ public class CommentEntity {
         this.id = id;
     }
 
-    public int getChatMomentId() {
+    public String getChatMomentId() {
         return chatMomentId;
     }
 
-    public void setChatMomentId(int chatMomentId) {
+    public void setChatMomentId(String chatMomentId) {
         this.chatMomentId = chatMomentId;
     }
 
@@ -86,7 +89,7 @@ public class CommentEntity {
     }
 
     public CommentEntity(String content, String avatar,
-                         String username, String nick, int chatMomentId, Date date) {
+                         String username, String nick, String chatMomentId, Date date) {
         this.content = content;
         this.avatar = avatar;
         this.username = username;

@@ -13,7 +13,7 @@ import java.util.List;
 public interface CommentDao {
 
     // todo 分页
-    @Query("SELECT * FROM comments WHERE chatMomentId = :chatMomentId")
+    @Query("SELECT * FROM comments WHERE comment_chat_id = :chatMomentId")
     List<CommentEntity> loadComments(int chatMomentId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

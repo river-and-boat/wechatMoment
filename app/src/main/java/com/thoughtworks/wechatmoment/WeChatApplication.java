@@ -18,6 +18,14 @@ public class WeChatApplication extends Application {
         super.onCreate();
         appExecutors = new AppExecutors();
         weChatDataBase = WeChatDataBase.getInstance(this, appExecutors);
-        dataRepository =
+        dataRepository = DataRepository.getInstance(weChatDataBase);
+    }
+
+    public WeChatDataBase getWeChatDataBase() {
+        return weChatDataBase;
+    }
+
+    public DataRepository getDataRepository() {
+        return dataRepository;
     }
 }
