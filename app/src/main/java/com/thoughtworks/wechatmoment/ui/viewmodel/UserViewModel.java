@@ -6,15 +6,10 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.thoughtworks.wechatmoment.WeChatApplication;
-import com.thoughtworks.wechatmoment.db.WeChatDataBase;
 import com.thoughtworks.wechatmoment.db.entity.UserEntity;
-import com.thoughtworks.wechatmoment.db.model.User;
 import com.thoughtworks.wechatmoment.db.repository.DataRepository;
-import com.thoughtworks.wechatmoment.db.repository.user.UserLocalImp;
-import com.thoughtworks.wechatmoment.db.repository.user.UserRepository;
 
 public class UserViewModel extends AndroidViewModel {
     private static MutableLiveData<UserEntity> userInfo;

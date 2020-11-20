@@ -8,15 +8,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.thoughtworks.wechatmoment.R;
-import com.thoughtworks.wechatmoment.db.model.ChatMoment;
-import com.thoughtworks.wechatmoment.db.model.ContentImage;
-import com.thoughtworks.wechatmoment.db.model.UserSender;
+import com.thoughtworks.wechatmoment.db.entity.ChatMomentEntity;
 
 import java.util.List;
 
@@ -25,7 +21,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.ViewHolder>
         implements View.OnClickListener {
 
-    private List<ChatMoment> chatMoments;
+    private List<ChatMomentEntity> chatMoments;
     private Context context;
 
     public static final String VIEW_NAME = "Admire Click";
@@ -36,7 +32,7 @@ public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.Vi
     private final int commentButtonId = R.id.comment;
 
     public WeChatItemAdapter(Context context,
-                             List<ChatMoment> chatMoments) {
+                             List<ChatMomentEntity> chatMoments) {
         this.chatMoments = chatMoments;
         this.context = context;
     }
@@ -50,16 +46,16 @@ public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        UserSender sender = chatMoments.get(position).getSender();
+        ChatMomentEntity chatMomentEntity = chatMoments.get(position);
         String content = chatMoments.get(position).getContent();
-        List<ContentImage> images = chatMoments.get(position).getImages();
+        // todo 嵌套recycleview
+        // List<ContentImage> images = chatMoments.get(position).get();
 
-        holder.username.setText(sender.getUsername());
+        holder.username.setText(chatMomentEntity.getUsername());
         holder.content.setText(content);
 
-        // TODO: How to avoid load picture in UI Thread
         Glide.with(context).asBitmap()
-                .load(sender.getAvatar())
+                .load(chatMomentEntity.getAvatar())
                 .into(holder.userAvatar);
 
         holder.admireIcon.setVisibility(View.GONE);

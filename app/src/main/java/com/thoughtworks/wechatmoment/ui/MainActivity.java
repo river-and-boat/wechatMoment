@@ -25,12 +25,11 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.thoughtworks.wechatmoment.R;
+import com.thoughtworks.wechatmoment.db.entity.ChatMomentEntity;
 import com.thoughtworks.wechatmoment.db.entity.UserEntity;
 import com.thoughtworks.wechatmoment.ui.adapter.WeChatItemAdapter;
 import com.thoughtworks.wechatmoment.ui.core.AdmireOperation;
 import com.thoughtworks.wechatmoment.ui.core.CommentOperation;
-import com.thoughtworks.wechatmoment.db.model.ChatMoment;
-import com.thoughtworks.wechatmoment.db.model.User;
 import com.thoughtworks.wechatmoment.ui.viewmodel.UserViewModel;
 import com.thoughtworks.wechatmoment.ui.viewmodel.WeChatItemViewModel;
 
@@ -96,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
     private void initChatItemViewModel() {
         chatItemViewModel = ViewModelProviders.of(this).get(WeChatItemViewModel.class);
         chatItemViewModel.init();
-        chatItemViewModel.getChatMomentList().observe(this, (Observer<List<ChatMoment>>)
+        chatItemViewModel.getChatMomentList().observe(this, (Observer<List<ChatMomentEntity>>)
                 chatMoments -> weChatItemAdapter.notifyDataSetChanged());
         chatItemViewModel.getItemIsUpdating().observe(this, isUpdating -> {
             swipeRefreshLayout.setRefreshing(isUpdating);
@@ -115,7 +114,6 @@ public class MainActivity extends AppCompatActivity {
         profileImage = findViewById(R.id.back_image);
         userViewModel.getUserInfo().observe(this, user -> {
             username.setText(user.getNick());
-            // Or It has been an async framework.
             Glide.with(MainActivity.this).asBitmap()
                     .load(user.getAvatar()).into(avatar);
             Glide.with(MainActivity.this).asBitmap()

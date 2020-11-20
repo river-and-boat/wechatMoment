@@ -1,45 +1,52 @@
 package com.thoughtworks.wechatmoment.ui.viewmodel;
 
+import android.app.Application;
 import android.os.Handler;
 import android.os.Message;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
-import com.thoughtworks.wechatmoment.db.model.ChatMoment;
-import com.thoughtworks.wechatmoment.db.repository.chatmoment.ChatMomentLocalImp;
-import com.thoughtworks.wechatmoment.db.repository.chatmoment.ChatMomentRepository;
+import com.thoughtworks.wechatmoment.WeChatApplication;
+import com.thoughtworks.wechatmoment.db.entity.ChatMomentEntity;
+import com.thoughtworks.wechatmoment.db.repository.DataRepository;
 
+import java.util.Date;
 import java.util.List;
 
-public class WeChatItemViewModel extends ViewModel {
+public class WeChatItemViewModel extends AndroidViewModel {
 
-    private static MutableLiveData<List<ChatMoment>> chatMoments;
+    private static MutableLiveData<List<ChatMomentEntity>> chatMoments;
     private static MutableLiveData<Boolean> itemIsUpdating = new MutableLiveData<>();
-    private ChatMomentRepository chatMomentRepository;
+    private DataRepository dataRepository;
 
     public void init() {
         if (chatMoments != null) {
             return;
         }
-        chatMomentRepository = ChatMomentLocalImp.getInstance();
         chatMoments = new MutableLiveData<>();
-        chatMoments.setValue(chatMomentRepository.getChatMomentList());
+        chatMoments.setValue(dataRepository.getChatMoments());
+    }
+
+    public WeChatItemViewModel(@NonNull Application application) {
+        super(application);
+        dataRepository = ((WeChatApplication) application).getDataRepository();
     }
 
     public LiveData<Boolean> getItemIsUpdating() {
         return itemIsUpdating;
     }
 
-    public LiveData<List<ChatMoment>> getChatMomentList() {
+    public LiveData<List<ChatMomentEntity>> getChatMomentList() {
         return chatMoments;
     }
 
     public void addNewItems() {
         itemIsUpdating.setValue(true);
-        chatMomentRepository.addNewChatMoment();
+        dataRepository.addChatMoment(new ChatMomentEntity("content", "avatar",
+                "username", "nick", new Date()));
     }
 
     public static class SimulationFetchResource extends Handler {
@@ -48,7 +55,7 @@ public class WeChatItemViewModel extends ViewModel {
             switch (msg.what) {
                 case 1:
                     // 模拟刷新朋友圈
-                    chatMoments.postValue((List<ChatMoment>) msg.obj);
+                    chatMoments.postValue((List<ChatMomentEntity>) msg.obj);
                     itemIsUpdating.postValue(false);
                     break;
                 default:
