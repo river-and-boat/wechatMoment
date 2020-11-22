@@ -3,8 +3,6 @@ package com.thoughtworks.wechatmoment.ui;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -26,14 +24,24 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.thoughtworks.wechatmoment.R;
 import com.thoughtworks.wechatmoment.db.entity.ChatMomentEntity;
-import com.thoughtworks.wechatmoment.db.entity.UserEntity;
+import com.thoughtworks.wechatmoment.db.entity.CommentEntity;
+import com.thoughtworks.wechatmoment.ui.adapter.WeChatCommentAdapter;
 import com.thoughtworks.wechatmoment.ui.adapter.WeChatItemAdapter;
 import com.thoughtworks.wechatmoment.ui.core.AdmireOperation;
 import com.thoughtworks.wechatmoment.ui.core.CommentOperation;
 import com.thoughtworks.wechatmoment.ui.viewmodel.UserViewModel;
 import com.thoughtworks.wechatmoment.ui.viewmodel.WeChatItemViewModel;
 
+import org.reactivestreams.Publisher;
+
 import java.util.List;
+import java.util.Observable;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,7 +49,9 @@ public class MainActivity extends AppCompatActivity {
     public static final String UNFOLD_TITLE = "";
 
     private WeChatItemAdapter weChatItemAdapter;
+
     private LinearLayoutManager linearLayoutManager;
+
     private RecyclerView recyclerView;
 
     private WeChatItemViewModel chatItemViewModel;
@@ -56,11 +66,6 @@ public class MainActivity extends AppCompatActivity {
     private ImageView avatar;
     private ImageView profileImage;
 
-    private final static String TEST_USER_EDIT_PROFILE = "https://timgsa.baidu.com/timg?" +
-            "image&quality=80&size=b9999_10000&sec=1603643811415&di=d80ffe3aa54af794ff4bb64e0f" +
-            "8b176f&imgtype=0&src=http%3A%2F%2Fa3.att.hudong.com%2F14%2F75%2F01300000164186121" +
-            "366756803686.jpg";
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -71,19 +76,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initChatItemViewModel();
         initToolBar();
         initWeChatAdapter();
-        initRecycleView();
+        initChatItemViewModel();
+        initWeChatItemRecycleView();
         initSwipeRefreshLayout();
         initUserInfo();
         addAppBarListener();
-
         admireOperation = new AdmireOperation();
         commentOperation = new CommentOperation();
     }
 
-    private void initRecycleView() {
+    private void initWeChatItemRecycleView() {
         linearLayoutManager = new LinearLayoutManager(this);
         recyclerView = findViewById(R.id.we_chat_container);
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -94,35 +98,32 @@ public class MainActivity extends AppCompatActivity {
 
     private void initChatItemViewModel() {
         chatItemViewModel = ViewModelProviders.of(this).get(WeChatItemViewModel.class);
-        chatItemViewModel.init();
-        chatItemViewModel.getChatMomentList().observe(this, (Observer<List<ChatMomentEntity>>)
-                chatMoments -> weChatItemAdapter.notifyDataSetChanged());
-        chatItemViewModel.getItemIsUpdating().observe(this, isUpdating -> {
-            swipeRefreshLayout.setRefreshing(isUpdating);
-            if (!isUpdating) {
-                recyclerView.smoothScrollToPosition(chatItemViewModel
-                        .getChatMomentList().getValue().size() - 1);
-            }
-        });
+        chatItemViewModel.getChatMomentList().subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(chatMomentEntities -> {
+                    weChatItemAdapter.setDataSource(chatMomentEntities);
+                    weChatItemAdapter.notifyDataSetChanged();
+                });
     }
 
     private void initUserInfo() {
         userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
-        userViewModel.init();
         avatar = findViewById(R.id.avatar);
         username = findViewById(R.id.username);
         profileImage = findViewById(R.id.back_image);
-        userViewModel.getUserInfo().observe(this, user -> {
-            username.setText(user.getNick());
-            Glide.with(MainActivity.this).asBitmap()
-                    .load(user.getAvatar()).into(avatar);
-            Glide.with(MainActivity.this).asBitmap()
-                    .load(user.getProfileImage()).into(profileImage);
-        });
+        userViewModel.getUserInfo().subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(userEntity -> {
+                    username.setText(userEntity.getNick());
+                    Glide.with(MainActivity.this).asBitmap()
+                            .load(userEntity.getAvatar()).into(avatar);
+                    Glide.with(MainActivity.this).asBitmap()
+                            .load(userEntity.getProfileImage()).into(profileImage);
+                });
         profileImage.setOnClickListener(v -> {
-            UserEntity userEditing = userViewModel.getUserInfo().getValue();
-            userEditing.setProfileImage(TEST_USER_EDIT_PROFILE);
-            userViewModel.editUserInfo(userEditing);
+//            UserEntity userEditing = userViewModel.getUserInfo().getValue();
+//            userEditing.setProfileImage(TEST_USER_EDIT_PROFILE);
+//            userViewModel.editUserInfo(userEditing);
         });
     }
 
@@ -134,8 +135,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initWeChatAdapter() {
-        weChatItemAdapter = new WeChatItemAdapter(this,
-                chatItemViewModel.getChatMomentList().getValue());
+        weChatItemAdapter = new WeChatItemAdapter(this);
         weChatItemAdapter.setOnItemClickListener((v, viewName, position) -> {
             View chatItem = linearLayoutManager.findViewByPosition(position);
             InputMethodManager inputMethodManager = (InputMethodManager)

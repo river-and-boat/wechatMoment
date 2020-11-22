@@ -1,22 +1,31 @@
 package com.thoughtworks.wechatmoment.ui.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.thoughtworks.wechatmoment.R;
 import com.thoughtworks.wechatmoment.db.entity.ChatMomentEntity;
+import com.thoughtworks.wechatmoment.ui.MainActivity;
+import com.thoughtworks.wechatmoment.ui.viewmodel.WeChatItemViewModel;
 
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.ViewHolder>
         implements View.OnClickListener {
@@ -28,20 +37,29 @@ public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.Vi
     public static final String COMMENT = "COMMENT";
     public static final String ITEM = "ITEM";
 
+    private WeChatCommentAdapter weChatCommentAdapter;
+    private WeChatItemViewModel weChatItemViewModel;
+
     private final int editButtonId = R.id.edit_button;
     private final int commentButtonId = R.id.comment;
 
-    public WeChatItemAdapter(Context context,
-                             List<ChatMomentEntity> chatMoments) {
-        this.chatMoments = chatMoments;
+    public WeChatItemAdapter(Context context) {
         this.context = context;
+        weChatItemViewModel = ViewModelProviders.of((MainActivity) context)
+                .get(WeChatItemViewModel.class);
+    }
+
+    public void setDataSource(List<ChatMomentEntity> chatMoments) {
+        this.chatMoments = chatMoments;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.wechat_item, parent, false));
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.wechat_item, parent, false);
+        initWeChatCommentRecycleView(view);
+        return new ViewHolder(view);
     }
 
     @Override
@@ -50,6 +68,16 @@ public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.Vi
         String content = chatMoments.get(position).getContent();
         // todo 嵌套recycleview
         // List<ContentImage> images = chatMoments.get(position).get();
+
+        // 嵌套adapter评论区
+        weChatItemViewModel.getComments(chatMomentEntity.getChatId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(commentEntities -> {
+                    weChatCommentAdapter.setDataSource(commentEntities);
+                    weChatCommentAdapter.notifyDataSetChanged();
+                });
+
 
         holder.username.setText(chatMomentEntity.getUsername());
         holder.content.setText(content);
@@ -82,6 +110,16 @@ public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.Vi
 
     public void setOnItemClickListener(OnItemClickListener itemClickListener) {
         this.onItemClickListener = itemClickListener;
+    }
+
+    private void initWeChatCommentRecycleView(View view) {
+        weChatCommentAdapter = new WeChatCommentAdapter(context);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
+        RecyclerView commentRecycleView = view.findViewById(R.id.comment_list);
+        commentRecycleView.setLayoutManager(linearLayoutManager);
+        commentRecycleView.setAdapter(weChatCommentAdapter);
+        commentRecycleView.addItemDecoration(
+                new DividerItemDecoration(context, LinearLayout.VERTICAL));
     }
 
     @Override

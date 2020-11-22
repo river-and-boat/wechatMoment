@@ -11,8 +11,10 @@ import com.thoughtworks.wechatmoment.WeChatApplication;
 import com.thoughtworks.wechatmoment.db.entity.UserEntity;
 import com.thoughtworks.wechatmoment.db.repository.DataRepository;
 
+import io.reactivex.Flowable;
+
 public class UserViewModel extends AndroidViewModel {
-    private static MutableLiveData<UserEntity> userInfo;
+
     private static MutableLiveData<Boolean> infoIsUpdating;
     private DataRepository dataRepository;
 
@@ -21,25 +23,15 @@ public class UserViewModel extends AndroidViewModel {
         dataRepository = ((WeChatApplication) application).getDataRepository();
     }
 
-    public void init() {
-        if (userInfo != null) {
-            return;
-        }
-        userInfo = new MutableLiveData<>();
-        userInfo.setValue(dataRepository.getUserInfo());
-    }
-
     public LiveData<Boolean> getUserIsUpdating() {
         return infoIsUpdating;
     }
 
-    public LiveData<UserEntity> getUserInfo() {
-        return userInfo;
+    public Flowable<UserEntity> getUserInfo() {
+        return dataRepository.getUserInfo();
     }
 
     public void editUserInfo(UserEntity user) {
         dataRepository.updateUserInfo(user);
-        // todo: flowable和compleble替换
-        userInfo.setValue(dataRepository.getUserInfo());
     }
 }

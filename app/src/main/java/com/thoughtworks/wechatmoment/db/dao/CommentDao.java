@@ -9,16 +9,17 @@ import com.thoughtworks.wechatmoment.db.entity.CommentEntity;
 
 import java.util.List;
 
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
+
 @Dao
 public interface CommentDao {
-
-    // todo 分页
     @Query("SELECT * FROM comments WHERE comment_chat_id = :chatMomentId")
-    List<CommentEntity> loadComments(int chatMomentId);
+    Flowable<List<CommentEntity>> loadComments(String chatMomentId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertAllComments(List<CommentEntity> comments);
+    Completable insertAllComments(List<CommentEntity> comments);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertAComments(CommentEntity comment);
+    Completable insertAComments(CommentEntity comment);
 }

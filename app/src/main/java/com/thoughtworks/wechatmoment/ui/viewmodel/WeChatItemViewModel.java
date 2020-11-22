@@ -11,24 +11,19 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.thoughtworks.wechatmoment.WeChatApplication;
 import com.thoughtworks.wechatmoment.db.entity.ChatMomentEntity;
+import com.thoughtworks.wechatmoment.db.entity.CommentEntity;
 import com.thoughtworks.wechatmoment.db.repository.DataRepository;
 
 import java.util.Date;
 import java.util.List;
 
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
+
 public class WeChatItemViewModel extends AndroidViewModel {
 
-    private static MutableLiveData<List<ChatMomentEntity>> chatMoments;
     private static MutableLiveData<Boolean> itemIsUpdating = new MutableLiveData<>();
     private DataRepository dataRepository;
-
-    public void init() {
-        if (chatMoments != null) {
-            return;
-        }
-        chatMoments = new MutableLiveData<>();
-        chatMoments.setValue(dataRepository.getChatMoments());
-    }
 
     public WeChatItemViewModel(@NonNull Application application) {
         super(application);
@@ -39,13 +34,17 @@ public class WeChatItemViewModel extends AndroidViewModel {
         return itemIsUpdating;
     }
 
-    public LiveData<List<ChatMomentEntity>> getChatMomentList() {
-        return chatMoments;
+    public Flowable<List<ChatMomentEntity>> getChatMomentList() {
+        return dataRepository.getChatMoments();
     }
 
-    public void addNewItems() {
+    public Flowable<List<CommentEntity>> getComments(String chatMomentId) {
+        return dataRepository.getComments(chatMomentId);
+    }
+
+    public Completable addNewItems() {
         itemIsUpdating.setValue(true);
-        dataRepository.addChatMoment(new ChatMomentEntity("content", "avatar",
+        return dataRepository.addChatMoment(new ChatMomentEntity("content", "avatar",
                 "username", "nick", new Date()));
     }
 
@@ -55,7 +54,6 @@ public class WeChatItemViewModel extends AndroidViewModel {
             switch (msg.what) {
                 case 1:
                     // 模拟刷新朋友圈
-                    chatMoments.postValue((List<ChatMomentEntity>) msg.obj);
                     itemIsUpdating.postValue(false);
                     break;
                 default:

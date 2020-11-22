@@ -1,14 +1,14 @@
 package com.thoughtworks.wechatmoment.db.repository;
 
-import android.os.AsyncTask;
-
 import com.thoughtworks.wechatmoment.db.WeChatDataBase;
 import com.thoughtworks.wechatmoment.db.entity.ChatMomentEntity;
 import com.thoughtworks.wechatmoment.db.entity.CommentEntity;
 import com.thoughtworks.wechatmoment.db.entity.UserEntity;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
+
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
 
 public class DataRepository {
 
@@ -31,27 +31,27 @@ public class DataRepository {
         return dataRepository;
     }
 
-    public List<ChatMomentEntity> getChatMoments() {
+    public Flowable<List<ChatMomentEntity>> getChatMoments() {
         return weChatDataBase.chatMomentDao().loadChatMoments();
     }
 
-    public void addChatMoment(ChatMomentEntity chatMomentEntity) {
-        weChatDataBase.chatMomentDao().insertACharMoment(chatMomentEntity);
+    public Completable addChatMoment(ChatMomentEntity chatMomentEntity) {
+        return weChatDataBase.chatMomentDao().insertACharMoment(chatMomentEntity);
     }
 
-    public List<CommentEntity> getComments(int chatMomentId) {
+    public Flowable<List<CommentEntity>> getComments(String chatMomentId) {
         return weChatDataBase.commentDao().loadComments(chatMomentId);
     }
 
-    public void addComment(CommentEntity commentEntity) {
-        weChatDataBase.commentDao().insertAComments(commentEntity);
+    public Completable addComment(CommentEntity commentEntity) {
+        return weChatDataBase.commentDao().insertAComments(commentEntity);
     }
 
-    public void updateUserInfo(UserEntity userEntity) {
-        weChatDataBase.userDao().updateUserInfo(userEntity);
+    public Completable updateUserInfo(UserEntity userEntity) {
+        return weChatDataBase.userDao().updateUserInfo(userEntity);
     }
 
-    public UserEntity getUserInfo() {
+    public Flowable<UserEntity> getUserInfo() {
         return weChatDataBase.userDao().getUser();
     }
 }

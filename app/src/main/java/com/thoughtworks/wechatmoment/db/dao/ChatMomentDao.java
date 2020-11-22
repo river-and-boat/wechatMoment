@@ -9,18 +9,21 @@ import com.thoughtworks.wechatmoment.db.entity.ChatMomentEntity;
 
 import java.util.List;
 
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
+
 @Dao
 public interface ChatMomentDao {
 
     @Query("SELECT * FROM chat_moments")
-    List<ChatMomentEntity> loadChatMoments();
+    Flowable<List<ChatMomentEntity>> loadChatMoments();
 
     @Query("SELECT * FROM chat_moments WHERE chat_id = :chatMomentId")
-    ChatMomentEntity loadChatMomentsById(int chatMomentId);
+    Flowable<ChatMomentEntity> loadChatMomentsById(int chatMomentId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertChatMoments(List<ChatMomentEntity> chatMoments);
+    Completable insertChatMoments(List<ChatMomentEntity> chatMoments);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertACharMoment(ChatMomentEntity chatMoment);
+    Completable insertACharMoment(ChatMomentEntity chatMoment);
 }

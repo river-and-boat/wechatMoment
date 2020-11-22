@@ -15,11 +15,11 @@ import io.reactivex.Flowable;
 public interface UserDao {
 
     @Query("SELECT * FROM user")
-    UserEntity getUser();
+    Flowable<UserEntity> getUser();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertAUser(UserEntity user);
+    Completable insertAUser(UserEntity user);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    void updateUserInfo(UserEntity user);
+    Completable updateUserInfo(UserEntity user);
 }
