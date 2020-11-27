@@ -21,5 +21,5 @@ public interface CommentDao {
     Completable insertAllComments(List<CommentEntity> comments);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    Completable insertAComments(CommentEntity comment);
+    Completable insertAComment(CommentEntity comment);
 }

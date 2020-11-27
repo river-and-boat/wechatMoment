@@ -12,6 +12,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -29,11 +30,13 @@ import com.thoughtworks.wechatmoment.ui.adapter.WeChatCommentAdapter;
 import com.thoughtworks.wechatmoment.ui.adapter.WeChatItemAdapter;
 import com.thoughtworks.wechatmoment.ui.core.AdmireOperation;
 import com.thoughtworks.wechatmoment.ui.core.CommentOperation;
+import com.thoughtworks.wechatmoment.ui.viewmodel.CommentViewModel;
 import com.thoughtworks.wechatmoment.ui.viewmodel.UserViewModel;
 import com.thoughtworks.wechatmoment.ui.viewmodel.WeChatItemViewModel;
 
 import org.reactivestreams.Publisher;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Observable;
 
@@ -56,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
     private WeChatItemViewModel chatItemViewModel;
     private UserViewModel userViewModel;
+    private CommentViewModel commentViewModel;
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
@@ -98,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initChatItemViewModel() {
         chatItemViewModel = ViewModelProviders.of(this).get(WeChatItemViewModel.class);
+        commentViewModel = ViewModelProviders.of(this).get(CommentViewModel.class);
         chatItemViewModel.getChatMomentList().subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(chatMomentEntities -> {
@@ -136,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initWeChatAdapter() {
         weChatItemAdapter = new WeChatItemAdapter(this);
-        weChatItemAdapter.setOnItemClickListener((v, viewName, position) -> {
+        weChatItemAdapter.setOnItemClickListener((v, viewName, position, chatId) -> {
             View chatItem = linearLayoutManager.findViewByPosition(position);
             InputMethodManager inputMethodManager = (InputMethodManager)
                     getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -150,6 +155,12 @@ public class MainActivity extends AppCompatActivity {
                         inputMethodManager = (InputMethodManager)
                                 getSystemService(Context.INPUT_METHOD_SERVICE);
                         commentOperation.expandCommentWeChatItem(inputMethodManager, chatItem, recyclerView);
+                        CommentEntity commentEntity = new CommentEntity("Test Comment", "JYZ", "JYZ", "JYZ", chatId, new Date());
+                        commentEntity.setId(6);
+                        commentViewModel.addComment(commentEntity)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe();
                         break;
                     default:
                         inputMethodManager = (InputMethodManager)

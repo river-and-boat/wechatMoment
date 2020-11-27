@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide;
 import com.thoughtworks.wechatmoment.R;
 import com.thoughtworks.wechatmoment.db.entity.ChatMomentEntity;
 import com.thoughtworks.wechatmoment.ui.MainActivity;
+import com.thoughtworks.wechatmoment.ui.viewmodel.CommentViewModel;
 import com.thoughtworks.wechatmoment.ui.viewmodel.WeChatItemViewModel;
 
 import java.util.List;
@@ -33,20 +34,21 @@ public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.Vi
     private List<ChatMomentEntity> chatMoments;
     private Context context;
 
+    private View view;
+
     public static final String VIEW_NAME = "Admire Click";
     public static final String COMMENT = "COMMENT";
     public static final String ITEM = "ITEM";
 
-    private WeChatCommentAdapter weChatCommentAdapter;
-    private WeChatItemViewModel weChatItemViewModel;
+    private CommentViewModel commentViewModel;
 
     private final int editButtonId = R.id.edit_button;
     private final int commentButtonId = R.id.comment;
 
     public WeChatItemAdapter(Context context) {
         this.context = context;
-        weChatItemViewModel = ViewModelProviders.of((MainActivity) context)
-                .get(WeChatItemViewModel.class);
+        commentViewModel = ViewModelProviders.of((MainActivity) context)
+                .get(CommentViewModel.class);
     }
 
     public void setDataSource(List<ChatMomentEntity> chatMoments) {
@@ -58,7 +60,7 @@ public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.Vi
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.wechat_item, parent, false);
-        initWeChatCommentRecycleView(view);
+        this.view = view;
         return new ViewHolder(view);
     }
 
@@ -69,15 +71,16 @@ public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.Vi
         // todo 嵌套recycleview
         // List<ContentImage> images = chatMoments.get(position).get();
 
+        WeChatCommentAdapter weChatCommentAdapter = new WeChatCommentAdapter(context);
+        initWeChatCommentRecycleView(view, weChatCommentAdapter);
         // 嵌套adapter评论区
-        weChatItemViewModel.getComments(chatMomentEntity.getChatId())
+        commentViewModel.getComments(chatMomentEntity.getChatId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(commentEntities -> {
                     weChatCommentAdapter.setDataSource(commentEntities);
                     weChatCommentAdapter.notifyDataSetChanged();
                 });
-
 
         holder.username.setText(chatMomentEntity.getUsername());
         holder.content.setText(content);
@@ -103,7 +106,7 @@ public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.Vi
     }
 
     public interface OnItemClickListener {
-        void onItemClick(View v, String viewName, int position);
+        void onItemClick(View v, String viewName, int position, String id);
     }
 
     private OnItemClickListener onItemClickListener;
@@ -112,8 +115,7 @@ public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.Vi
         this.onItemClickListener = itemClickListener;
     }
 
-    private void initWeChatCommentRecycleView(View view) {
-        weChatCommentAdapter = new WeChatCommentAdapter(context);
+    private void initWeChatCommentRecycleView(View view, WeChatCommentAdapter weChatCommentAdapter) {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
         RecyclerView commentRecycleView = view.findViewById(R.id.comment_list);
         commentRecycleView.setLayoutManager(linearLayoutManager);
@@ -128,13 +130,13 @@ public class WeChatItemAdapter extends RecyclerView.Adapter<WeChatItemAdapter.Vi
         if (onItemClickListener != null) {
             switch (v.getId()) {
                 case editButtonId:
-                    onItemClickListener.onItemClick(v, VIEW_NAME, position);
+                    onItemClickListener.onItemClick(v, VIEW_NAME, position, chatMoments.get(position).getChatId());
                     break;
                 case commentButtonId:
-                    onItemClickListener.onItemClick(v, COMMENT, position);
+                    onItemClickListener.onItemClick(v, COMMENT, position, chatMoments.get(position).getChatId());
                     break;
                 default:
-                    onItemClickListener.onItemClick(v, ITEM, position);
+                    onItemClickListener.onItemClick(v, ITEM, position, chatMoments.get(position).getChatId());
                     break;
             }
         }

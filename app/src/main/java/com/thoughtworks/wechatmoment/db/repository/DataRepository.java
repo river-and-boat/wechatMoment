@@ -44,7 +44,7 @@ public class DataRepository {
     }
 
     public Completable addComment(CommentEntity commentEntity) {
-        return weChatDataBase.commentDao().insertAComments(commentEntity);
+        return weChatDataBase.commentDao().insertAComment(commentEntity);
     }
 
     public Completable updateUserInfo(UserEntity userEntity) {

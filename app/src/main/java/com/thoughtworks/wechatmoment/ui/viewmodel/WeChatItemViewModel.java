@@ -38,10 +38,6 @@ public class WeChatItemViewModel extends AndroidViewModel {
         return dataRepository.getChatMoments();
     }
 
-    public Flowable<List<CommentEntity>> getComments(String chatMomentId) {
-        return dataRepository.getComments(chatMomentId);
-    }
-
     public Completable addNewItems() {
         itemIsUpdating.setValue(true);
         return dataRepository.addChatMoment(new ChatMomentEntity("content", "avatar",
